@@ -3,48 +3,102 @@
 {% block content %}
 {% load static %}
 
-
-
+<!-- Background Section -->
 <div class="breadcumb-area bg-img bg-overlay" style="background-image:url('{% static "assets/img/bg-img/hero-1.jpg" %}');">
 </div>
 
 <section class="dorne-single-listing-area section-padding-100">
     <div class="container">
-
-
-
         {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+            <ul class="messages alert alert-info">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
 
-    <div>
-        <h2>{{ destinationdata.place_name }}</h2>
-        <img src="{{ destinationdata.image.url }}" alt="{{ destinationdata.place_name }}" width="300">
-        <p><strong>State:</strong> {{ destinationdata.state }}</p>
-        <p><strong>District:</strong> {{ destinationdata.district }}</p>
-        <p><strong>Google Map Link:</strong> <a href="{{ destinationdata.google_map_link }}" target="_blank">{{ destinationdata.google_map_link }}</a></p>
-        <p><strong>Description:</strong></p>
-        <ul>
-            {% for desc in destinations %}
-            <li>{{ desc }}</li>
-            {% endfor %}
-        </ul>
+        <div class="row">
+            <!-- Left Side: Destination Details -->
+            <div class="col-lg-6 pe-lg-5 border-end">
+                <div class="single-listing-image text-center mb-4">
+                    <img src="{{ destinationdata.image.url }}" alt="{{ destinationdata.place_name }}" class="img-fluid rounded shadow-lg">
+                </div>
+                <div class="single-listing-content">
+                    <h4>{{ destinationdata.place_name }}</h4>
+                    <hr>
+                    <p>{{ destinationdata.description }}</p>
+                    <p><strong>State:</strong> {{ destinationdata.state }}</p>
+                    <p><strong>District:</strong> {{ destinationdata.district }}</p>
+                    <p><strong>Weather:</strong> {{ destinationdata.weather }}</p>
+                    <p><strong>Google Map:</strong> 
+                        <a href="{{ destinationdata.google_map_link }}" target="_blank" class="btn btn-primary btn-sm">View on Map</a>
+                    </p>
+                </div>
+                
+            </div>
+
+            <!-- Right Side: Update Form -->
+            <div class="col-lg-6">
+                <div class="card shadow-lg border-1 p-4 bg-light">
+                    <h2 class="text-center mb-3">Update Destination</h2>
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- Place Name -->
+                        <div class="mb-3">
+                            <label for="place_name" class="form-label">Place Name</label>
+                            <input type="text" name="place_name" class="form-control" id="place_name" placeholder="Enter place name" value="{{ form.place_name.value }}" required>
+                        </div>
+
+                        <!-- Weather -->
+                        <div class="mb-3">
+                            <label for="weather" class="form-label">Weather</label>
+                            <input type="text" name="weather" class="form-control" id="weather" placeholder="Enter weather details" value="{{ form.weather.value }}" required>
+                        </div>
+
+                        <!-- State & District -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="state" class="form-label">State</label>
+                                    <input type="text" name="state" class="form-control" id="state" placeholder="Enter state" value="{{ form.state.value }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="district" class="form-label">District</label>
+                                    <input type="text" name="district" class="form-control" id="district" placeholder="Enter district" value="{{ form.district.value }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Google Map Link -->
+                        <div class="mb-3">
+                            <label for="google_map_link" class="form-label">Google Map Link</label>
+                            <input type="url" name="google_map_link" class="form-control" id="google_map_link" placeholder="Enter Google Map URL" value="{{ form.google_map_link.value }}" required>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea name="description" class="form-control" id="description" rows="4" placeholder="Enter description" required>{{ form.description.value }}</textarea>
+                        </div>
+
+                        <!-- Image Upload -->
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Upload Image</label>
+                            <input type="file" name="image" class="form-control" id="image">
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-success btn-center">Update Destination</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
     </div>
-
-    <h2>Update Details Form</h2>
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-
-        <button type="submit">Update Destination</button>
-    </form>
-
-</div>
 </section>
-
 
 {% endblock %}

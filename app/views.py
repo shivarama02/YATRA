@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect, get_object_or_404
 import requests
 from .models import TouristDestination
 from .serializers import TouristDestinationSerializer
@@ -17,7 +17,7 @@ class TouristDestinationCreateView(generics.ListCreateAPIView):
 class TouristDestinationDetailView(generics.ListAPIView):
     queryset = TouristDestination.objects.all()
     serializer_class = TouristDestinationSerializer
-    
+
 class DeleteTouristDestination(generics.DestroyAPIView):
     queryset = TouristDestination.objects.all()
     serializer_class = TouristDestinationSerializer
@@ -33,7 +33,7 @@ def create_tourist_destination(request):
         google_map_link = request.POST.get('google_map_link')
         description = request.POST.get('description')
         image = request.FILES.get('image')
-        
+
         if place_name and weather and state and district and google_map_link and description :
             try:
                 # Create a new TouristDestination instance and save it to the database
@@ -47,9 +47,9 @@ def create_tourist_destination(request):
                     image=image
                 )
                 destination.save()
-                
+
                 # Prepare data for the API request
-                api_url = 'http://127.0.0.1:8000/tourist-destinations/'
+                api_url = 'http://shivarama02.pythonanywhere.com/tourist-destinations/'
                 data = {
                     'place_name': place_name,
                     'weather': weather,
@@ -59,10 +59,10 @@ def create_tourist_destination(request):
                     'description': description
                 }
                 files = {'image': image}
-                
+
                 # Send POST request to the API
                 response = requests.post(api_url, data=data, files=files)
-                
+
                 if response.status_code == 400:  # HTTP 201 Created
                     messages.success(request, 'Tourist Destination Inserted Successfully')
                     return redirect('add_destination')
@@ -76,34 +76,23 @@ def create_tourist_destination(request):
 
 
 
+
+
 def update_destination(request, pk):
-    api_url = f'http://127.0.0.1:8000/tourist-destinations-detail/{pk}/'
-    response = requests.get(api_url)
-    
-    if response.status_code == 200:
-        data = response.json()
-        destination_instance = TouristDestination.objects.get(pk=pk)
+    destination_instance = get_object_or_404(TouristDestination, pk=pk)  # Fetch directly from DB
 
-        
-        
-
-        if request.method == 'POST':
-            form = TouristDestinationForm(request.POST, request.FILES, instance=destination_instance)
-            if form.is_valid():
-                form.save()
-                messages.success(request, 'Destination details updated successfully.')
-                return redirect('update_destination', pk=pk)  # Redirect to update page on success
-            else:
-                messages.error(request, 'Error updating destination details. Please check the form.')
+    if request.method == 'POST':
+        form = TouristDestinationForm(request.POST, request.FILES, instance=destination_instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Destination details updated successfully.')
+            return redirect('update_destination', pk=pk)  # Stay on the update page
         else:
-            form = TouristDestinationForm(instance=destination_instance)
+            messages.error(request, 'Error updating destination details. Please check the form.')
+    else:
+        form = TouristDestinationForm(instance=destination_instance)
 
-        return render(request, 'update_destination.html', {'form': form, 'destinationdata': destination_instance, 'destinations': destinations})
-
-    # Handle error cases if the API request fails
-    messages.error(request, 'Failed to fetch destination details.')
-    return redirect('home')  # Redirect to home or any other page on API request failure
-
+    return render(request, 'update_destination.html', {'form': form, 'destinationdata': destination_instance})
 
 
 
@@ -120,27 +109,35 @@ def destinations(request):
     return render(request, 'destinations.html',{'destinations': destinations})
 
 def detailed_destination(request, pk):
-    api_url = f'http://127.0.0.1:8000/tourist-destinations-detail/{pk}/'
-    response = requests.get(api_url)
-    if response.status_code == 200:
-        data = response.json()
-        destination_instance = TouristDestination.objects.get(pk=pk)
-    
-    return render(request, 'detailed_destination.html',{'destination': destination_instance})
+    destination_instance = get_object_or_404(TouristDestination, pk=pk)  # Fetch directly from DB
+    return render(request, 'detailed_destination.html', {'destination': destination_instance})
 
 # def add_destination(request):
 #     return render(request, 'add_destination.html')
 
 
 def delete_destination(request, pk):
-    api_url = f'http://127.0.0.1:8000/tourist-destinations-delete/{pk}'
+    api_url = f'http://shivarama02.pythonanywhere.com/tourist-destinations-delete/{pk}'
 
     response = requests.delete(api_url)
 
     if response.status_code == 200:
         messages.success(request, 'Destination details updated successfully.')
-        
+
     else:
         print(f'Failed to delete item. Status code {response.status_code}')
 
     return redirect('destinations')
+
+def search_destinations(request):
+    query = request.GET.get('q', '').strip()  # Ensure no leading/trailing spaces
+    print("Search Query:", query)  # Debugging print
+
+    if query:
+        destinations = TouristDestination.objects.filter(
+            Q(place_name__iregex=f".*{query}.*") | Q(description__icontains=query)
+        )
+    else:
+        destinations = TouristDestination.objects.all()
+
+    return render(request, 'search_results.html', {'destinations': destinations, 'query': query})

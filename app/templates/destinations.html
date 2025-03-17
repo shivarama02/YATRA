@@ -4,13 +4,6 @@
 {% load static %}
 <!--Model-->
 
-
-
-<!--Model-->
-
-
-
-
 <div class="breadcumb-area bg-img bg-overlay" style="background-image: url('{% static "assets/img/bg-img/hero-1.jpg" %}');"></div>
     <!-- ***** Breadcumb Area End ***** -->
 
@@ -39,30 +32,18 @@
             <div class="row">
                 <!-- Single Features Area -->
                 {% for destination in destinations %}
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="single-features-area mb-50">
-                        <img src="{{ destination.image.url }}" alt="{{ destination.place_name }}">
-                        
-                      
-                        <div class="feature-content d-flex align-items-center justify-content-between">
-                            <div class="feature-title">
-                                <h5>{{ destination.place_name }}</h5>
-                                <p><i class="fa fa-map-marker" aria-hidden="true"></i>&nbsp;{{ destination.state }},{{ destination.district }}</p>
-                                <a href="{% url 'update_destination' destination.id %}">Update</a>
-                                
-                            </div>
-                            <div class="feature-favourite">
-                                <a href="{% url 'detailed_destination' destination.id %}"><i class="fa fa-info-circle" aria-hidden="true"></i></a>
-                            </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card shadow-sm">
+                        <img class="card-img-top" src="{{ destination.image.url }}" alt="{{ destination.place_name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ destination.place_name }}</h5>
+                            <p class="card-text text-muted">{{ destination.description|truncatewords:20 }}</p>
+                            <a href="{% url 'detailed_destination' pk=destination.pk %}" class="btn btn-outline-primary w-100">View More</a>
                         </div>
                     </div>
                 </div>
                 {% endfor %}
-                <!-- Single Features Area -->
-                 <!-- Single Features Area -->
-               
-                <!-- Single Features Area -->
-
+                
 
                  <!-- Add Destination option -->
                 <div class="col-12 col-sm-6 col-lg-3" >

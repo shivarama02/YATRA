@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-$xkq66sv8x7e43b@wqj3_kn^nbw90+28l%=&#)u&ln3fhb&l)8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -78,10 +78,10 @@ WSGI_APPLICATION = "yatra.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "yatra_db",
-        'USER':'root',
-        'PORT': 3306,
-        'HOST' : 'localhost',
+        "NAME": "shivarama02$my_table",
+        'USER':'shivarama02',
+        'HOST' : 'shivarama02.mysql.pythonanywhere-services.com',
+        'PASSWORD' : 'Shiva@2003',
     }
 }
 
